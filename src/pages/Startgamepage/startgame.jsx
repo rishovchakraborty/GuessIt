@@ -4,10 +4,17 @@ import TextInputFormContainer from "../../components/Textinputform/Textinputform
 
 function StartGame() {
   const [hint, setHint] = useState("");
+  const [maxWrongGuesses, setMaxWrongGuesses] = useState(5); // new state
   const navigate = useNavigate();
 
   function handleSubmit(word) {
-    navigate("/play", { state: { wordSelected: word, hint: hint } });
+    navigate("/play", {
+      state: {
+        wordSelected: word,
+        hint: hint,
+        maxWrongGuesses: parseInt(maxWrongGuesses), // pass along
+      },
+    });
   }
 
   return (
@@ -22,8 +29,21 @@ function StartGame() {
           type="text"
           value={hint}
           onChange={(e) => setHint(e.target.value)}
-          placeholder="e.g. It's an animal"
+          placeholder="Hint Related To Your Word"
           className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+      </div>
+
+      <div className="mt-4 w-full max-w-md">
+        <label className="block mb-1 font-medium text-gray-700">Max Wrong Guesses:</label>
+        <input
+          type="number"
+          min={1}
+          max={26}
+          value={maxWrongGuesses}
+          onChange={(e) => setMaxWrongGuesses(e.target.value)}
+          placeholder="e.g. 5"
+          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
         />
       </div>
     </div>
