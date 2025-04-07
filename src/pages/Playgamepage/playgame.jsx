@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import MaskedText from "../../components/Maskedtext/Maskedtext";
 import LetterButtons from "../../components/LetterButtons/Letterbuttons";
 import Timer from "../../components/Timer/Timer";
@@ -11,14 +11,15 @@ function Playgame() {
   const [gameEndedDueToTime, setGameEndedDueToTime] = useState(false);
 
   const location = useLocation();
-  const wordSelected = location.state?.wordSelected || "";
-  const hint = location.state?.hint || "";
-  const maxIncorrectGuesses = location.state?.maxWrongGuesses || 5;
+  const queryParams = new URLSearchParams(location.search);
+  const wordSelected = queryParams.get("word") || "";
+  const hint = queryParams.get("hint") || "";
+  const maxIncorrectGuesses = parseInt(queryParams.get("maxWrongGuesses")) || 5;
 
   const handleTimeUp = () => {
     setIsComplete(true);
     setGameEndedDueToTime(true);
-    navigator.vibrate?.([300, 100, 300]); // Vibrate on timeout
+    navigator.vibrate?.([300, 100, 300]);
   };
 
   const handleLetterClick = (letter) => {
@@ -27,11 +28,9 @@ function Playgame() {
     setUsedLetters((prev) => [...prev, letter]);
 
     if (!wordSelected.toUpperCase().includes(letter)) {
-      // ❌ Incorrect guess
       navigator.vibrate?.(200);
       setIncorrectGuesses((prev) => prev + 1);
     } else {
-      // ✅ Correct guess
       navigator.vibrate?.(100);
     }
   };
@@ -45,9 +44,9 @@ function Playgame() {
       setIsComplete(true);
 
       if (allGuessed) {
-        navigator.vibrate?.(100); // Light win vibration
+        navigator.vibrate?.(100);
       } else {
-        navigator.vibrate?.([300, 100, 300]); // Loss pattern
+        navigator.vibrate?.([300, 100, 300]);
       }
     }
   }, [usedLetters, incorrectGuesses, wordSelected, maxIncorrectGuesses]);
@@ -55,21 +54,17 @@ function Playgame() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-purple-200 text-black p-6">
       <div className="bg-white shadow-xl rounded-2xl p-6 w-full max-w-2xl text-center">
-
-        {/* Game Branding */}
         <h1 className="text-4xl md:text-5xl font-extrabold text-indigo-700 mb-2">
           🎯 Guess<span className="text-red-500">IT</span>
         </h1>
         <p className="text-sm text-gray-500 mb-4">Time-based Word Guessing Challenge</p>
 
-        {/* Hint */}
         {hint && (
           <p className="text-md text-gray-700 font-medium mb-2">
             💡 <span className="text-gray-600">Hint:</span> {hint}
           </p>
         )}
 
-        {/* Score */}
         <p className="text-sm text-gray-600 mb-2">
           ❌ Wrong Attempts:{" "}
           <span className="text-red-500 font-bold">
@@ -77,19 +72,16 @@ function Playgame() {
           </span>
         </p>
 
-        {/* Timer */}
         {!isComplete && (
           <div className="mb-4">
             <Timer initialTime={60} onTimeUp={handleTimeUp} isRunning={!isComplete} />
           </div>
         )}
 
-        {/* Masked word */}
         <div className="mb-6">
           <MaskedText text={wordSelected} usedLetters={usedLetters} />
         </div>
 
-        {/* Result messages */}
         {isComplete && !gameEndedDueToTime && incorrectGuesses < maxIncorrectGuesses && (
           <div className="mb-4 text-green-600 text-lg font-semibold">
             🎉 You guessed it right: <strong>{wordSelected.toUpperCase()}</strong>
@@ -102,7 +94,6 @@ function Playgame() {
           </div>
         )}
 
-        {/* Letters */}
         <div className="mb-6">
           <LetterButtons
             text={wordSelected}
@@ -111,13 +102,12 @@ function Playgame() {
           />
         </div>
 
-        {/* Restart */}
-        <Link
-          to="/start"
+        <a
+          href="/start"
           className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2 rounded-full transition duration-300"
         >
           🔁 Play Again
-        </Link>
+        </a>
       </div>
     </div>
   );
